@@ -1,0 +1,65 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Common rules for authenticated users
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if the user is an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
+    }
+
+    // Admins collection rules
+    match /admins/{email} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Notes collection rules
+    // Authenticated users can read notes.
+    // Only administrators can create, update, or delete notes, with basic data validation.
+    match /notes/{noteId} {
+      allow read: if true;
+      allow write: if isAdmin() && request.resource.data.keys().hasAll(['semester_id', 'subject_name', 'drive_link']) && request.resource.data.semester_id is string && request.resource.data.subject_name is string && request.resource.data.drive_link is string;
+    }
+
+    // Announcements collection rules
+    // Authenticated users can read announcements.
+    // Only administrators can create, update, or delete announcements, with basic data validation.
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow write: if isAdmin() && request.resource.data.keys().hasAll(['title', 'message', 'sent_by']) && request.resource.data.title is string && request.resource.data.message is string && request.resource.data.sent_by is string;
+    }
+
+    // Exam schedules collection rules
+    // Authenticated users can read exam schedules.
+    // Only administrators can create, update, or delete exam schedules, with basic data validation for creation.
+    match /exam_schedules/{scheduleId} {
+      allow read: if true;
+      allow create: if isAdmin() &&
+        request.resource.data.keys().hasAll(['subject', 'exam_date', 'exam_time']) &&
+        request.resource.data.subject is string &&
+        request.resource.data.exam_date is string &&
+        request.resource.data.exam_time is string;
+      allow update, delete: if isAdmin();
+    }
+
+    // Semesters collection rules
+    match /semesters/{semesterId} {
+      allow read: if true;
+      allow create: if isAdmin() && request.resource.data.keys().hasAll(['name']) && request.resource.data.name is string;
+      allow update, delete: if isAdmin();
+    }
+
+    // Chat messages collection rules
+    match /chat_messages/{messageId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.resource.data.user_id == request.auth.uid && request.resource.data.keys().hasAll(['content', 'user_id', 'is_general']) && request.resource.data.content is string && request.resource.data.user_id is string && request.resource.data.is_general is bool;
+      allow update, delete: if isAuthenticated() && request.resource.data.user_id == request.auth.uid || isAdmin();
+    }
+  }
+}
