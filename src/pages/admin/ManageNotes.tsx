@@ -14,7 +14,7 @@ import { Note, Semester, getNotes, getSemesters } from "@/lib/db";
 import { collection, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from "@/lib/firebase";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, ExternalLink } from "lucide-react";
 
 export default function ManageNotes() {
   const [semesters, setSemesters] = useState<Semester[]>([]);
@@ -133,28 +133,31 @@ export default function ManageNotes() {
     <div className="min-h-screen pb-32 md:pb-20">
       <Navbar />
       
-      <main className="container mx-auto px-4 py-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Manage Notes</h1>
+      <main className="container mx-auto px-4 py-12 md:py-16 max-w-6xl">
+        <div className="flex justify-between items-start mb-8 md:mb-12">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-semibold tracking-tight mb-2">Manage Notes</h1>
+            <p className="text-lg text-muted-foreground">Add, edit, and delete course notes</p>
+          </div>
           
           <Dialog open={isDialogOpen} onOpenChange={(open) => {
             setIsDialogOpen(open);
             if (!open) resetForm();
           }}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
+              <Button size="lg">
+                <Plus className="w-5 h-5 mr-2" />
                 Add Note
               </Button>
             </DialogTrigger>
             <DialogContent className="max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{editingNote ? "Edit Note" : "Add New Note"}</DialogTitle>
+                <DialogTitle className="text-2xl">{editingNote ? "Edit Note" : "Add New Note"}</DialogTitle>
               </DialogHeader>
               
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-5 mt-4">
                 <div>
-                  <Label>Semester</Label>
+                  <Label className="text-base font-semibold mb-2 block">Semester</Label>
                   <Select
                     value={formData.semester_id}
                     onValueChange={(value) => setFormData({ ...formData, semester_id: value })}
@@ -173,7 +176,7 @@ export default function ManageNotes() {
                 </div>
                 
                 <div>
-                  <Label>Subject Name</Label>
+                  <Label className="text-base font-semibold mb-2 block">Subject Name</Label>
                   <Input
                     required
                     value={formData.subject_name}
@@ -183,7 +186,7 @@ export default function ManageNotes() {
                 </div>
                 
                 <div>
-                  <Label>Google Drive Link</Label>
+                  <Label className="text-base font-semibold mb-2 block">Google Drive Link</Label>
                   <Input
                     required
                     type="url"
@@ -194,16 +197,17 @@ export default function ManageNotes() {
                 </div>
                 
                 <div>
-                  <Label>Description (Optional)</Label>
+                  <Label className="text-base font-semibold mb-2 block">Description (Optional)</Label>
                   <Textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Brief description of the note"
+                    rows={4}
                   />
                 </div>
                 
-                <div className="flex gap-2">
-                  <Button type="submit" className="flex-1">
+                <div className="flex gap-3 pt-4">
+                  <Button type="submit" className="flex-1" size="lg">
                     {editingNote ? "Update" : "Add"} Note
                   </Button>
                   <Button
@@ -213,6 +217,7 @@ export default function ManageNotes() {
                       setIsDialogOpen(false);
                       resetForm();
                     }}
+                    size="lg"
                   >
                     Cancel
                   </Button>
@@ -222,13 +227,13 @@ export default function ManageNotes() {
           </Dialog>
         </div>
 
-        <div className="mb-4">
+        <div className="mb-6">
           <Select value={selectedSemester} onValueChange={setSelectedSemester}>
-            <SelectTrigger className="max-w-xs">
+            <SelectTrigger className="w-full sm:max-w-xs">
               <SelectValue placeholder="Filter by semester" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Semesters</SelectItem>
+              <SelectItem value="">All Semesters</SelectItem>
               {semesters.map((sem) => (
                 <SelectItem key={sem.id} value={sem.id}>
                   {sem.name}
@@ -238,43 +243,48 @@ export default function ManageNotes() {
           </Select>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredNotes.map((note) => (
-            <Card key={note.id} className="p-4">
-              <div className="flex justify-between items-start">
+            <Card key={note.id} className="p-5 md:p-6 border-0 hover:shadow-md transition-all duration-200">
+              <div className="flex justify-between items-start gap-4">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg">{note.subject_name}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">
+                  <h3 className="font-semibold text-lg mb-2">{note.subject_name}</h3>
+                  <p className="text-sm text-muted-foreground mb-2 font-medium">
                     {semesters.find(s => s.id === note.semester_id)?.name}
                   </p>
                   {note.description && (
-                    <p className="text-sm mb-2">{note.description}</p>
+                    <p className="text-sm text-muted-foreground mb-3">{note.description}</p>
                   )}
-                  <a
-                    href={note.drive_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-primary hover:underline"
-                  >
-                    View/Download
-                  </a>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Downloads: {note.downloads || 0}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={note.drive_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline flex items-center gap-1"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      View/Download
+                    </a>
+                    <span className="text-xs text-muted-foreground">•</span>
+                    <span className="text-xs text-muted-foreground">
+                      {note.downloads || 0} downloads
+                    </span>
+                  </div>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-shrink-0">
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant="ghost"
                     onClick={() => openEditDialog(note)}
                   >
                     <Pencil className="w-4 h-4" />
                   </Button>
                   <Button
                     size="sm"
-                    variant="destructive"
+                    variant="ghost"
                     onClick={() => handleDelete(note.id)}
+                    className="text-destructive hover:text-destructive"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -284,9 +294,9 @@ export default function ManageNotes() {
           ))}
           
           {filteredNotes.length === 0 && (
-            <Card className="p-8 text-center">
-              <p className="text-muted-foreground">No notes found. Add your first note!</p>
-            </Card>
+            <div className="text-center py-12">
+              <p className="text-lg text-muted-foreground">No notes found</p>
+            </div>
           )}
         </div>
       </main>

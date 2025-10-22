@@ -82,61 +82,57 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/50">
       <div className="container mx-auto px-4 py-3 md:py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <img
               src="/logo.png"
               alt="Logo"
-              className="h-8 w-8 md:h-8 md:w-8"
-              style={{
-                width: '80px',
-                height: '31px'
-              }}
+              className="h-8 w-auto"
             />
-            <span className="text-xl md:text-2xl font-bold italic">Tuition</span>
+            <span className="text-lg md:text-xl font-semibold">Tuition</span>
           </Link>
 
-          <div className="flex items-center gap-2 md:gap-6">
-            <div className="hidden md:flex items-center gap-6">
-              <Link to="/" className="text-foreground/80 hover:text-foreground transition-colors">
+          <div className="flex items-center gap-2 md:gap-8">
+            <div className="hidden md:flex items-center gap-8">
+              <Link to="/" className="text-foreground/70 hover:text-foreground transition-colors text-sm font-medium">
                 Home
               </Link>
-              <Link to="/schedule" className="text-foreground/80 hover:text-foreground transition-colors">
+              <Link to="/schedule" className="text-foreground/70 hover:text-foreground transition-colors text-sm font-medium">
                 Schedule
               </Link>
-              <Link to="/notes" className="text-foreground/80 hover:text-foreground transition-colors">
+              <Link to="/notes" className="text-foreground/70 hover:text-foreground transition-colors text-sm font-medium">
                 Notes
               </Link>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 md:gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="rounded-full h-9 w-9 relative"
+                    className="relative"
                   >
-                    <Bell className="h-4 w-4 md:h-5 md:w-5" />
+                    <Bell className="h-5 w-5" />
                     {announcements.length > 0 && (
-                      <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                      <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                       </span>
                     )}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-80" align="end">
-                  <DropdownMenuLabel>Announcements</DropdownMenuLabel>
+                  <DropdownMenuLabel className="text-sm font-semibold">Announcements</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <ScrollArea className="h-72 w-full rounded-md border">
+                  <ScrollArea className="h-72 w-full rounded-md">
                     {announcements.length > 0 ? (
                       announcements.map((announcement) => (
                         <DropdownMenuItem
                           key={announcement.id}
-                          className="flex flex-col items-start space-y-1 cursor-pointer"
+                          className="flex flex-col items-start space-y-1 cursor-pointer px-3 py-2"
                           onClick={() => handleAnnouncementClick(announcement)}
                         >
                           <p className="text-sm font-medium leading-none">{announcement.title}</p>
@@ -145,7 +141,7 @@ export const Navbar = () => {
                         </DropdownMenuItem>
                       ))
                     ) : (
-                      <DropdownMenuItem className="text-center text-muted-foreground">
+                      <DropdownMenuItem className="text-center text-muted-foreground text-sm">
                         No new announcements
                       </DropdownMenuItem>
                     )}
@@ -157,19 +153,17 @@ export const Navbar = () => {
                 variant="ghost"
                 size="icon"
                 onClick={toggleDarkMode}
-                className="rounded-full h-9 w-9"
               >
-                {darkMode ? <Sun className="h-4 w-4 md:h-5 md:w-5" /> : <Moon className="h-4 w-4 md:h-5 md:w-5" />}
+                {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </Button>
 
               {user ? (
-                <div className="hidden md:flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-3">
                   <span className="text-sm text-muted-foreground">{user.email}</span>
                   <Button
-                    variant="destructive"
+                    variant="ghost"
                     size="sm"
                     onClick={handleLogout}
-                    className="rounded-full"
                   >
                     Logout
                   </Button>
@@ -179,7 +173,6 @@ export const Navbar = () => {
                   onClick={() => navigate("/auth")}
                   variant="default"
                   size="sm"
-                  className="rounded-full text-xs md:text-sm"
                 >
                   Sign In
                 </Button>

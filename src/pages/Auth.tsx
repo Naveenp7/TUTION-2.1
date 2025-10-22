@@ -64,17 +64,18 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <Card className="w-full max-w-md p-8 border-0 shadow-sm">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome to Tuition</h1>
-          <p className="text-muted-foreground">Sign in to access your dashboard</p>
+          <h1 className="text-4xl font-semibold mb-2 tracking-tight">Welcome</h1>
+          <p className="text-base text-muted-foreground">Sign in to access your learning hub</p>
         </div>
 
         <Button
           onClick={handleGoogleSignIn}
           disabled={signingIn}
-          className="w-full"
+          className="w-full py-3 text-base"
+          variant="default"
           size="lg"
         >
           <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -98,7 +99,16 @@ const Auth = () => {
           {signingIn ? "Signing in..." : "Continue with Google"}
         </Button>
 
-        <p className="text-sm text-muted-foreground text-center mt-6">
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border"></div>
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground">Or</span>
+          </div>
+        </div>
+
+        <p className="text-xs text-muted-foreground text-center">
           By signing in, you agree to our Terms of Service and Privacy Policy
         </p>
       </Card>

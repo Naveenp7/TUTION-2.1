@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Send, MessageCircle } from "lucide-react";
+import { Send, MessageCircle, X } from "lucide-react";
 import { format } from "date-fns";
 import { onAuthStateChange } from "@/lib/auth";
 import { subscribeToChat, sendChatMessage } from "@/lib/db";
@@ -76,7 +76,7 @@ export function Chat({ subjectName, isGeneral = false }: ChatProps) {
   };
 
   return (
-    <div className="fixed bottom-20 right-4 z-50">
+    <div className="fixed bottom-20 right-4 z-50 md:bottom-4">
       {!isOpen ? (
         <Button
           onClick={() => setIsOpen(true)}
@@ -86,21 +86,22 @@ export function Chat({ subjectName, isGeneral = false }: ChatProps) {
           <MessageCircle className="w-6 h-6" />
         </Button>
       ) : (
-        <Card className="w-80 sm:w-96 h-[500px] flex flex-col shadow-xl">
-          <div className="p-4 border-b flex justify-between items-center">
-            <h3 className="font-semibold">
+        <Card className="w-80 sm:w-96 h-[500px] flex flex-col shadow-2xl border-0">
+          <div className="p-4 md:p-5 border-b border-border flex justify-between items-center">
+            <h3 className="font-semibold text-base">
               {isGeneral ? "General Chat" : `${subjectName} Chat`}
             </h3>
             <Button
               variant="ghost"
-              size="sm"
+              size="icon"
               onClick={() => setIsOpen(false)}
+              className="h-8 w-8"
             >
-              ✕
+              <X className="w-4 h-4" />
             </Button>
           </div>
           
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -109,15 +110,17 @@ export function Chat({ subjectName, isGeneral = false }: ChatProps) {
                 }`}
               >
                 <div
-                  className={`max-w-[75%] rounded-lg p-3 ${
+                  className={`max-w-[75%] rounded-lg p-3 text-sm ${
                     msg.user_id === user?.uid
                       ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                      : "bg-secondary text-secondary-foreground"
                   }`}
                 >
-                  <p className="text-xs font-semibold mb-1">{msg.user_name}</p>
-                  <p className="text-sm">{msg.content}</p>
-                  <p className="text-xs opacity-70 mt-1">
+                  {msg.user_id !== user?.uid && (
+                    <p className="text-xs font-semibold mb-1 opacity-80">{msg.user_name}</p>
+                  )}
+                  <p className="text-sm leading-relaxed">{msg.content}</p>
+                  <p className="text-xs opacity-60 mt-1">
                     {format(new Date(msg.created_at), "p")}
                   </p>
                 </div>
@@ -132,13 +135,13 @@ export function Chat({ subjectName, isGeneral = false }: ChatProps) {
             )}
           </div>
           
-          <form onSubmit={handleSubmit} className="p-4 border-t">
+          <form onSubmit={handleSubmit} className="p-4 md:p-5 border-t border-border">
             <div className="flex gap-2">
               <Textarea
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Type your message..."
-                className="resize-none"
+                className="resize-none text-sm"
                 rows={2}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
